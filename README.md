@@ -1,5 +1,4 @@
 # Fitzone-Fitness_Platform
-# FitZone – Fitness & Gym Management Platform
 
 **FitZone** is a full-stack fitness and gym management web application built using the **MERN stack (MongoDB, Express.js, React.js, and Node.js)**.
 
