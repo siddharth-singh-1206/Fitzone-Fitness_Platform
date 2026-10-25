@@ -1,11 +1,12 @@
 const express = require('express');
+const path = require('path');
 const dotenv = require('dotenv');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 
 // Load environment variables before importing anything that uses them
-dotenv.config();
+dotenv.config({ path: path.join(__dirname, '.env') });
 
 const connectDB = require('./config/db');
 const errorHandler = require('./middleware/errorHandler');
@@ -18,6 +19,7 @@ const planRoutes = require('./routes/planRoutes');
 const membershipRoutes = require('./routes/membershipRoutes');
 const enquiryRoutes = require('./routes/enquiryRoutes');
 const userRoutes = require('./routes/userRoutes');
+const attendanceRoutes = require('./routes/attendanceRoutes');
 
 // ── Connect to MongoDB ────────────────────────────────────────────────────
 connectDB();
@@ -25,12 +27,33 @@ connectDB();
 const app = express();
 
 // ── Security middleware ───────────────────────────────────────────────────
-app.use(helmet());
+app.use(helmet({ crossOriginResourcePolicy: false }));
 
 // ── CORS ─────────────────────────────────────────────────────────────────
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://127.0.0.1:5173',
+  'http://localhost:5174',
+  'http://127.0.0.1:5174',
+  'http://localhost:3000',
+  'http://127.0.0.1:3000',
+  process.env.CLIENT_URL,
+].filter(Boolean);
+
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || 'http://localhost:5173',
+    origin: (origin, callback) => {
+      // allow requests with no origin (like mobile apps, curl, postman)
+      if (!origin) return callback(null, true);
+      if (
+        allowedOrigins.includes(origin) ||
+        /^http:\/\/localhost:\d+$/.test(origin) ||
+        /^http:\/\/127\.0\.0\.1:\d+$/.test(origin)
+      ) {
+        return callback(null, true);
+      }
+      return callback(null, true);
+    },
     credentials: true,
   })
 );
@@ -63,6 +86,7 @@ app.use('/api/plans', planRoutes);
 app.use('/api/memberships', membershipRoutes);
 app.use('/api/enquiries', enquiryRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/attendance', attendanceRoutes);
 
 // ── 404 handler for unknown API routes ───────────────────────────────────
 app.use((req, res) => {
