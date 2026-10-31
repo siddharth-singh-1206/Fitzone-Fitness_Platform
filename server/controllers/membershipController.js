@@ -136,10 +136,75 @@ const deleteMembership = async (req, res, next) => {
   }
 };
 
+/**
+ * @desc   Admin unsubscribe/cancel a membership by membership ID
+ * @route  PUT /api/memberships/:id/unsubscribe
+ * @access Private (admin only)
+ */
+const unsubscribeMembership = async (req, res, next) => {
+  try {
+    const membership = await Membership.findByIdAndUpdate(
+      req.params.id,
+      { status: 'cancelled' },
+      { new: true, runValidators: true }
+    )
+      .populate('user', 'name email role')
+      .populate('plan');
+
+    if (!membership) {
+      return res
+        .status(404)
+        .json({ success: false, message: 'Membership not found' });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: `Successfully unsubscribed user from ${membership.plan?.name || 'membership'}`,
+      data: membership,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * @desc   Admin unsubscribe a user's active membership by user ID
+ * @route  PUT /api/memberships/user/:userId/unsubscribe
+ * @access Private (admin only)
+ */
+const unsubscribeByUserId = async (req, res, next) => {
+  try {
+    const membership = await Membership.findOneAndUpdate(
+      { user: req.params.userId, status: 'active' },
+      { status: 'cancelled' },
+      { new: true }
+    )
+      .populate('user', 'name email role')
+      .populate('plan');
+
+    if (!membership) {
+      return res.status(404).json({
+        success: false,
+        message: 'No active membership found for this user',
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: `Successfully unsubscribed user from ${membership.plan?.name || 'membership'}`,
+      data: membership,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   createMembership,
   getMyMembership,
   getAllMemberships,
   updateMembership,
   deleteMembership,
+  unsubscribeMembership,
+  unsubscribeByUserId,
 };

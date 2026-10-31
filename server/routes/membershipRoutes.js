@@ -6,6 +6,8 @@ const {
   getAllMemberships,
   updateMembership,
   deleteMembership,
+  unsubscribeMembership,
+  unsubscribeByUserId,
 } = require('../controllers/membershipController');
 const { protect, adminOnly } = require('../middleware/auth');
 
@@ -17,6 +19,12 @@ router.get('/my', protect, getMyMembership);
 
 // GET    /api/memberships      — admin only
 router.get('/', protect, adminOnly, getAllMemberships);
+
+// PUT    /api/memberships/:id/unsubscribe — admin only
+router.put('/:id/unsubscribe', protect, adminOnly, unsubscribeMembership);
+
+// PUT    /api/memberships/user/:userId/unsubscribe — admin only
+router.put('/user/:userId/unsubscribe', protect, adminOnly, unsubscribeByUserId);
 
 // PUT    /api/memberships/:id  — admin only
 router.put('/:id', protect, adminOnly, updateMembership);
