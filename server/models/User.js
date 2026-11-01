@@ -29,6 +29,26 @@ const userSchema = new mongoose.Schema(
       enum: ['user', 'admin'],
       default: 'user',
     },
+    phone: {
+      type: String,
+      default: '',
+    },
+    fitnessGoal: {
+      type: String,
+      default: 'General Fitness',
+    },
+    currentWeight: {
+      type: Number,
+      default: 70,
+    },
+    targetWeight: {
+      type: Number,
+      default: 65,
+    },
+    height: {
+      type: Number,
+      default: 175,
+    },
   },
   { timestamps: true }
 );

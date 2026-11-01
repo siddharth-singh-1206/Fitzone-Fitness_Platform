@@ -70,6 +70,15 @@ export function AuthProvider({ children }) {
     navigate('/')
   }
 
+  /**
+   * Update user state in context and localStorage.
+   */
+  const updateUser = (updatedUser) => {
+    const merged = { ...user, ...updatedUser }
+    localStorage.setItem('fitzone_user', JSON.stringify(merged))
+    setUser(merged)
+  }
+
   const value = {
     user,
     token,
@@ -77,6 +86,7 @@ export function AuthProvider({ children }) {
     login,
     register,
     logout,
+    updateUser,
     isAuthenticated: !!user,
     isAdmin: user?.role === 'admin',
   }

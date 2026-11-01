@@ -1,14 +1,29 @@
 const User = require('../models/User');
+const Membership = require('../models/Membership');
 
 /**
- * @desc   Get all users (no passwords)
+ * @desc   Get all users (no passwords) with their active membership if any
  * @route  GET /api/users
  * @access Private (admin only)
  */
 const getAllUsers = async (req, res, next) => {
   try {
-    const users = await User.find();
-    res.status(200).json({ success: true, data: users });
+    const users = await User.find().lean();
+    const activeMemberships = await Membership.find({ status: 'active' }).populate('plan');
+
+    const membershipMap = {};
+    activeMemberships.forEach((m) => {
+      if (m.user) {
+        membershipMap[m.user.toString()] = m;
+      }
+    });
+
+    const usersWithMembership = users.map((u) => ({
+      ...u,
+      activeMembership: membershipMap[u._id.toString()] || null,
+    }));
+
+    res.status(200).json({ success: true, data: usersWithMembership });
   } catch (error) {
     next(error);
   }

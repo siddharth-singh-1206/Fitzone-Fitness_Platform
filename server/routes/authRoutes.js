@@ -4,6 +4,7 @@ const {
   register,
   login,
   getMe,
+  updateProfile,
   registerValidation,
   loginValidation,
 } = require('../controllers/authController');
@@ -18,5 +19,8 @@ router.post('/login', loginValidation, validate, login);
 
 // GET /api/auth/me
 router.get('/me', protect, getMe);
+
+// PUT /api/auth/profile
+router.put('/profile', protect, updateProfile);
 
 module.exports = router;

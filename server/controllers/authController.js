@@ -108,6 +108,35 @@ const getMe = async (req, res, next) => {
   }
 };
 
+/**
+ * @desc   Update user profile and fitness goals
+ * @route  PUT /api/auth/profile
+ * @access Private (protect)
+ */
+const updateProfile = async (req, res, next) => {
+  try {
+    const { name, phone, fitnessGoal, currentWeight, targetWeight, height } = req.body;
+
+    const fieldsToUpdate = {};
+    if (name) fieldsToUpdate.name = name.trim();
+    if (phone !== undefined) fieldsToUpdate.phone = phone.trim();
+    if (fitnessGoal !== undefined) fieldsToUpdate.fitnessGoal = fitnessGoal;
+    if (currentWeight !== undefined) fieldsToUpdate.currentWeight = Number(currentWeight);
+    if (targetWeight !== undefined) fieldsToUpdate.targetWeight = Number(targetWeight);
+    if (height !== undefined) fieldsToUpdate.height = Number(height);
+
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user._id,
+      { $set: fieldsToUpdate },
+      { new: true, runValidators: true }
+    );
+
+    res.status(200).json({ success: true, data: updatedUser });
+  } catch (error) {
+    next(error);
+  }
+};
+
 /** Validation rules for the register endpoint */
 const registerValidation = [
   check('name', 'Name is required').notEmpty().trim(),
@@ -127,6 +156,7 @@ module.exports = {
   register,
   login,
   getMe,
+  updateProfile,
   registerValidation,
   loginValidation,
 };
