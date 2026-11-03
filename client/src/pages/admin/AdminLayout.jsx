@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { NavLink, Outlet, useNavigate } from 'react-router-dom'
+import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import {
   LayoutDashboard,
@@ -12,6 +12,9 @@ import {
   LogOut,
   Menu,
   X,
+  Sparkles,
+  Globe,
+  ArrowUpRight,
 } from 'lucide-react'
 
 const NAV_ITEMS = [
@@ -26,7 +29,7 @@ const NAV_ITEMS = [
 
 /**
  * AdminLayout — sidebar navigation + outlet for admin pages.
- * Has its own mobile header with hamburger since global Navbar is hidden.
+ * Fully aligned with obsidian luxury theme.
  */
 export default function AdminLayout() {
   const { user, logout } = useAuth()
@@ -34,39 +37,38 @@ export default function AdminLayout() {
   const navigate = useNavigate()
 
   const navClass = ({ isActive }) =>
-    `flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
+    `flex items-center gap-3 px-4 py-2.5 rounded-full text-xs sm:text-sm font-semibold transition-all ${
       isActive
-        ? 'bg-orange-500/20 text-orange-400 border border-orange-500/30'
-        : 'text-gray-400 hover:bg-gray-800 hover:text-white'
+        ? 'bg-white text-gray-950 shadow-[0_0_20px_rgba(255,255,255,0.25)]'
+        : 'text-gray-400 hover:bg-white/5 hover:text-white'
     }`
 
   const Sidebar = () => (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full bg-[#08080c] border-r border-white/10">
       {/* Logo */}
-      <div className="px-6 py-5 border-b border-gray-800">
-        <div className="flex items-center gap-2 text-lg font-extrabold">
-          <Dumbbell className="text-orange-500" size={22} />
-          <span className="text-white">FIT</span>
-          <span className="text-orange-500">ZONE</span>
+      <div className="px-6 py-5 border-b border-white/10">
+        <div className="flex items-center gap-2 text-base font-black tracking-wider">
+          <Dumbbell className="text-white" size={20} />
+          <span className="text-white uppercase font-extrabold tracking-widest">FIT ZONE</span>
         </div>
-        <p className="text-gray-600 text-xs mt-1">Admin Panel</p>
+        <p className="text-gray-500 text-[11px] mt-1 font-mono uppercase tracking-wider">Admin Console</p>
       </div>
 
       {/* User info */}
-      <div className="px-6 py-4 border-b border-gray-800">
+      <div className="px-6 py-4 border-b border-white/10 bg-[#0c0d12]">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-full bg-orange-500 flex items-center justify-center text-white font-bold text-sm">
+          <div className="w-9 h-9 rounded-full bg-white/10 border border-white/15 flex items-center justify-center text-white font-bold text-sm shadow-md">
             {user?.name?.[0]?.toUpperCase()}
           </div>
           <div>
-            <p className="text-white text-sm font-semibold">{user?.name}</p>
-            <p className="text-gray-500 text-xs">Administrator</p>
+            <p className="text-white text-xs font-bold">{user?.name}</p>
+            <p className="text-gray-400 text-[11px]">Administrator</p>
           </div>
         </div>
       </div>
 
       {/* Nav links */}
-      <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+      <nav className="flex-1 px-4 py-6 space-y-1.5 overflow-y-auto">
         {NAV_ITEMS.map((item) => (
           <NavLink
             key={item.to}
@@ -81,23 +83,34 @@ export default function AdminLayout() {
         ))}
       </nav>
 
-      {/* Logout */}
-      <div className="px-3 py-4 border-t border-gray-800">
+      {/* View Live Website & Logout */}
+      <div className="px-4 py-4 border-t border-white/10 space-y-2">
+        <Link
+          to="/"
+          className="flex items-center justify-between w-full px-4 py-2.5 rounded-full text-xs font-semibold bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white border border-white/10 transition-all shadow-sm group"
+        >
+          <span className="flex items-center gap-2">
+            <Globe size={15} className="text-gray-400 group-hover:text-white" />
+            <span>View Live Website</span>
+          </span>
+          <ArrowUpRight size={14} className="text-gray-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+        </Link>
+
         <button
           onClick={logout}
-          className="flex items-center gap-3 w-full px-4 py-3 rounded-lg text-sm font-medium text-gray-400 hover:bg-red-600/20 hover:text-red-400 transition-colors"
+          className="flex items-center gap-3 w-full px-4 py-2 rounded-full text-xs font-medium text-gray-400 hover:bg-red-500/15 hover:text-red-400 transition-colors"
         >
-          <LogOut size={18} />
-          Logout
+          <LogOut size={16} />
+          <span>Exit Admin</span>
         </button>
       </div>
     </div>
   )
 
   return (
-    <div className="flex h-screen bg-gray-950 overflow-hidden">
+    <div className="flex h-screen bg-[#050508] text-white overflow-hidden">
       {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex flex-col w-64 bg-gray-900 border-r border-gray-800 shrink-0">
+      <aside className="hidden lg:flex flex-col w-64 shrink-0">
         <Sidebar />
       </aside>
 
@@ -106,39 +119,38 @@ export default function AdminLayout() {
         <div className="lg:hidden fixed inset-0 z-40 flex">
           {/* Backdrop */}
           <div
-            className="absolute inset-0 bg-black/60"
+            className="absolute inset-0 bg-black/80 backdrop-blur-md"
             onClick={() => setSidebarOpen(false)}
           />
           {/* Drawer */}
-          <aside className="relative w-64 bg-gray-900 border-r border-gray-800 flex flex-col z-50">
+          <aside className="relative w-64 flex flex-col z-50">
             <Sidebar />
           </aside>
         </div>
       )}
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex-1 flex flex-col overflow-hidden bg-[#050508]">
         {/* Mobile Header */}
-        <header className="lg:hidden flex items-center justify-between px-4 py-4 bg-gray-900 border-b border-gray-800 shrink-0">
+        <header className="lg:hidden flex items-center justify-between px-5 py-4 bg-[#09090e] border-b border-white/10 shrink-0">
           <button
             onClick={() => setSidebarOpen(true)}
-            className="text-gray-300 hover:text-white"
+            className="text-gray-300 hover:text-white p-1"
             aria-label="Open menu"
           >
             <Menu size={22} />
           </button>
-          <div className="flex items-center gap-1 font-extrabold">
-            <Dumbbell className="text-orange-500" size={18} />
-            <span className="text-white text-sm">FITZONE</span>
-            <span className="text-orange-500 text-sm"> Admin</span>
+          <div className="flex items-center gap-2 font-black">
+            <Dumbbell className="text-white" size={18} />
+            <span className="text-white text-xs tracking-wider uppercase">FitZone Admin</span>
           </div>
-          <div className="w-8 h-8 rounded-full bg-orange-500 flex items-center justify-center text-white text-xs font-bold">
+          <div className="w-8 h-8 rounded-full bg-white/10 border border-white/15 flex items-center justify-center text-white text-xs font-bold">
             {user?.name?.[0]?.toUpperCase()}
           </div>
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 overflow-y-auto p-6 bg-gray-950">
+        <main className="flex-1 overflow-y-auto p-4 sm:p-8 bg-[#050508]">
           <Outlet />
         </main>
       </div>
